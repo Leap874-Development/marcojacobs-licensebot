@@ -1,0 +1,241 @@
+<link rel="stylesheet" href="/static/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T">
+
+<script src="/static/jquery-3.4.1.min.js" integrity="sha384-vk5WoKIaW/vJyUAd9n/wmopsmNhiy+L2Z+SBxGYnUkunIxVxAv/UtMOhba/xskxh"></script>
+<script src="/static/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"></script>
+
+<style>
+    body {
+        margin-right: 40px;
+        margin-left: 40px;
+        margin-top: 30px;
+        /* margin-left: 80px;
+        margin-right: 80px;
+        margin-top: 30px; */
+    }
+
+    #searchbar {
+        width: 300px;
+    }
+
+    .profile {
+        width: 30px;
+        border-radius: 50%;
+    }
+
+    .user {
+        width: 750px;
+    }
+</style>
+
+<title>Admin Panel | {{ admin.username }}</title>
+
+<body>
+    <h1>Admin Panel</h1>
+    <p>Logged in as <strong>{{ admin.username }}#{{ admin.discriminator }}</strong>&nbsp;<a href="/logout">Logout</a></p>
+    <hr />
+
+    <div class="form-inline">
+        <input id="searchbar" class="form-control" placeholder="Search users..."></input>&nbsp;
+        <button id="save-all" type="button" class="btn btn-info">Apply All</button>&nbsp;
+        <button id="revoke-all" type="button" class="btn btn-secondary">Remove All</button>
+    </div>
+
+    <br />
+
+    <ul id="all-users" class="list-group">
+        {% for user in users %}
+            <li id="li-{{ user.id }}" class="list-group-item user {% if user.exists == false %}list-group-item-danger{% endif %}">
+                {% if user.exists == true %}
+                    <img class="profile" src="{{ user.avatar }}"></img>
+                    <strong>{{ user.username }}</strong><span style="color: dimgray">#{{ user.discriminator }}</span>
+                {% endif %}
+
+                {% if user.exists == false %}
+                    <img class="profile" src="https://cdn.discordapp.com/embed/avatars/0.png"></img>
+                    <strong>Unknown</strong><span style="color: dimgray">#{{ user.id }}</span>
+                {% endif %}
+
+                <img id="star-{{ user.id }}" {% if user.licenced == false %}hidden{% endif %} class="star" src="/static/star_icon.png" width="25px"></img>
+    
+                <div class="float-right">
+                    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#modal-delete-{{ user.id }}">
+                        Delete
+                    </button>
+
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-{{ user.id }}">
+                        Edit
+                    </button>
+                </div>
+
+                <div class="modal fade" id="modal-delete-{{ user.id }}" tabindex="-1" role="dialog">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                Are you sure?
+                            </div>
+    
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                <button id="delete-{{ user.id }}" type="button" class="delete btn btn-danger">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        
+                <div class="modal fade" id="modal-{{ user.id }}" tabindex="-1" role="dialog">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <div>
+                                    {% if user.exists == true %}
+                                        <img class="profile" src="{{ user.avatar }}"></img>
+                                        <strong>{{ user.username }}</strong><span style="color: dimgray">#{{ user.discriminator }}</span>
+                                    {% endif %}
+                    
+                                    {% if user.exists == false %}
+                                        <img class="profile" src="https://cdn.discordapp.com/embed/avatars/0.png"></img>
+                                        <strong>Unknown</strong><span style="color: dimgray">#{{ user.id }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                
+                            <div class="modal-body">
+                                <div class="btn-group" role="group">
+                                    <button id="unlic-{{ user.id }}" type="button" class="unlic btn btn-{% if user.licenced == false %}primary{% endif %}{% if user.licenced %}light{% endif %}">Unlicenced</button>
+                                    <button id="lic-{{ user.id }}" type="button" class="lic btn btn-{% if user.licenced %}primary{% endif %}{% if user.licenced == false %}light{% endif %}">Licenced</button>
+                                </div>
+
+                                <br/><br/>
+     
+                                <textarea id="notes-{{ user.id }}" class="notes form-control" placeholder="Notes...">{{ user.notes }}</textarea>
+                            </div>
+                
+                            <div class="modal-footer">
+                                <!-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> -->
+                                <button id="save-{{ user.id }}" type="button" class="save btn btn-primary" data-dismiss="modal">Save</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+
+<script>
+	var users = []
+
+	function id_from_el(elem) {
+        return $(elem).attr('id').split('-')[1]
+    }
+
+    $('#searchbar').on('keyup', () => {
+        var value = $('#searchbar').val().toLowerCase()
+        $("#all-users li").filter((i, e) => {
+            $(e).show()
+            var strong = $(e).find('strong')[0]
+            var username = $(strong).text().toLowerCase()
+            var found = username.indexOf(value) == -1
+            return found
+        }).hide()
+    })
+
+    $('.user').each((i, e) => {
+        users.push(id_from_el(e))
+    })
+
+    $('#save-all').click(() => {
+        $('#save-all').attr('disabled', true)
+        setTimeout(() => {
+            $('#save-all').attr('disabled', false)
+        }, 10 * 1000)
+
+        $.post('/update_all', {mode: 'apply'}, (resp, raw, xhr) => {
+			if (xhr.status != 200) location.reload()
+            console.log('updated all')
+        })
+    })
+
+    $('#revoke-all').click(() => {
+        $('#revoke-all').attr('disabled', true)
+        setTimeout(() => {
+            $('#revoke-all').attr('disabled', false)
+        }, 10 * 1000)
+
+        $.post('/update_all', {mode: 'revoke'}, (resp, raw, xhr) => {
+			if (xhr.status != 200) location.reload()
+            console.log('revoked all')
+        })
+    })
+
+    $('.lic').click((e) => {
+        var id = id_from_el(e.target)
+
+        // $('#save-' + id).attr('disabled', false)
+
+        $('#lic-' + id).removeClass('btn-light')
+        $('#lic-' + id).addClass('btn-primary')
+
+        $('#unlic-' + id).removeClass('btn-primary')
+        $('#unlic-' + id).addClass('btn-light')
+
+        // $('#star-' + id).attr('hidden', false)
+    })
+
+    $('.unlic').click((e) => {
+        var id = id_from_el(e.target)
+
+        // $('#save-' + id).attr('disabled', false)
+
+        $('#unlic-' + id).removeClass('btn-light')
+        $('#unlic-' + id).addClass('btn-primary')
+
+        $('#lic-' + id).removeClass('btn-primary')
+        $('#lic-' + id).addClass('btn-light')
+
+        // $('#star-' + id).attr('hidden', true)
+    })
+
+    $('.notes').on('change keyup paste', (e) => {
+        var id = id_from_el(e.target)
+
+        // $('#save-' + id).attr('disabled', false)
+    })
+
+    $('.save').click((e) => {
+        var id = id_from_el(e.target)
+        var licenced = $('#lic-' + id).hasClass('btn-primary')
+        var data = {
+            id: id,
+            licenced: licenced,
+            notes: $('#notes-' + id).val()
+        }
+
+        if (licenced) $('#star-' + id).attr('hidden', false)
+        else $('#star-' + id).attr('hidden', true)
+
+        $.post('/update', data, (resp, raw, xhr) => {
+			if (xhr.status != 200) location.reload()
+            console.log('updated', data)
+            // $('#save-' + id).attr('disabled', true)
+        })
+    })
+
+    $('.delete').click((e) => {
+        var id = id_from_el(e.target)
+        var data = {id: id}
+
+        $('#modal-delete-' + id).removeClass('fade')
+        $('#modal-delete-' + id).modal('hide')
+        $('#li-' + id).remove()
+
+        $.post('/delete', data, (resp, raw, xhr) => {
+			if (xhr.status != 200) location.reload()
+            $('#modal-delete-' + id).removeClass('fade')
+            $('#modal-delete-' + id).modal('hide')
+            $('#li-' + id).remove()
+            console.log('deleted', data)
+        })
+    })
+
+</script>

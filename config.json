@@ -1,0 +1,22 @@
+{
+    "permissions": ["identify", "email"],
+    "discord_invite": "",
+    "admins": ["176415653069062146"],
+
+    "licenced_roles": ["licenced"],
+    "unlicenced_roles": [],
+
+    "database": "database.json",
+    "acting_guild": "445308420980080651",
+
+    "protocol": "http",
+    "ip": "localhost",
+    "port": 8000,
+    "secret_length": 64,
+    "session_age": 20,
+
+    "api": "https://discordapp.com/api/v6/",
+    "debug": false,
+
+    "required_perms": ["MANAGE_ROLES"]
+}

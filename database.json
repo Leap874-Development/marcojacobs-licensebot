@@ -1,0 +1,19 @@
+{
+  "users": [
+    {
+      "id": "176415653069062146",
+      "licenced": true,
+      "notes": ""
+    },
+    {
+      "id": "172002275412279296",
+      "licenced": false,
+      "notes": ""
+    },
+    {
+      "id": "512863367120289803",
+      "licenced": true,
+      "notes": "some cool info"
+    }
+  ]
+}

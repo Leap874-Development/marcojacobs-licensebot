@@ -1,0 +1,41 @@
+<style>
+body {
+    background-color: #ffffff;
+}
+
+.centered {
+    width: 400px;
+    height: 180px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #f1f1f1;
+    border-width: 2px;
+    font-family: 'Tahoma', Geneva, sans-serif;
+}
+
+#login {
+    text-align: center;
+    background-color: #99aab5;
+    border-style: solid;
+    border-width: 2px;
+    border-color: black;
+    padding: 1px 20px;
+    border-radius: 10px;
+
+    position: fixed;
+    top: 60%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+</style>
+
+<title>Authorize Discord</title>
+
+<div class="centered">
+    <h1 style="text-align: center">Login with Discord</h1>
+    <a href="{{ oauth2 }}">
+        <button id="login"><h2>Authorize</h2></button>
+    </a>
+</div>

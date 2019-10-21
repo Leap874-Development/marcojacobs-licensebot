@@ -1,0 +1,25 @@
+{
+  "name": "licensebot",
+  "version": "1.0.0",
+  "description": "Manages user licenses through discord. Written for @marcojacobs on Fiverr",
+  "main": "webapp.js",
+  "dependencies": {
+    "axios": "^0.19.0",
+    "body-parser": "^1.19.0",
+    "cookie-parser": "^1.4.4",
+    "discord-oauth2": "^1.4.1",
+    "discord.js": "^11.5.1",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "lowdb": "^1.0.0",
+    "serve-favicon": "^2.5.0",
+    "sqlite3": "^4.1.0",
+    "swig": "^1.4.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "node webapp.js"
+  },
+  "author": "William Gardner",
+  "license": "ISC"
+}
